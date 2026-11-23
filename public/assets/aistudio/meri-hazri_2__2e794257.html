@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prince Orviel</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#1b2330;--mu:#6b7686;--bd:#e3e8f0;--pr:#4f46e5;--P:#16a34a;--A:#dc2626;--L:#d97706;--H:#7c3aed;--O:#64748b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141c;--card:#1a212d;--tx:#e8edf5;--mu:#93a0b4;--bd:#2a3342;--pr:#818cf8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10141c;--card:#1a212d;--tx:#e8edf5;--mu:#93a0b4;--bd:#2a3342;--pr:#818cf8;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Noto Sans Devanagari",sans-serif;font-size:15px}
+.w{max-width:520px;margin:0 auto;padding:12px}
+h1{font-size:19px;margin:4px 0 10px;text-align:center}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
+.mon{display:flex;align-items:center;justify-content:space-between}
+.mon b{font-size:17px}
+button{font:inherit;cursor:pointer}
+.nb{background:var(--bg);border:1px solid var(--bd);color:var(--tx);border-radius:10px;padding:6px 14px;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.dh{text-align:center;font-size:12px;color:var(--mu)}
+.d{aspect-ratio:1;border:1px solid var(--bd);border-radius:9px;background:var(--bg);color:var(--tx);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;padding:0;line-height:1.2}
+.d small{font-weight:700;font-size:12px}
+.d.today{outline:2px solid var(--pr)}.d{position:relative}.d i.m{position:absolute;top:1px;right:4px;font-size:10px;font-style:normal;font-weight:700}
+.d.P{background:var(--P);color:#fff;border-color:var(--P)}.d.A{background:var(--A);color:#fff;border-color:var(--A)}
+.d.L{background:var(--L);color:#fff;border-color:var(--L)}.d.H{background:var(--H);color:#fff;border-color:var(--H)}.d.O{background:var(--O);color:#fff;border-color:var(--O)}
+.leg{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--mu);margin-top:8px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.qa{width:100%;margin-top:10px;background:var(--P);color:#fff;border:0;border-radius:10px;padding:11px;font-weight:600}
+.sum{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
+.sum div{background:var(--bg);border-radius:10px;padding:8px 2px}
+.sum b{display:block;font-size:20px}.sum span{font-size:11px;color:var(--mu)}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--bd)}
+.row:last-child{border:0}
+.tot{font-weight:700;font-size:17px}
+input,select{font:inherit;width:100%;padding:9px;border-radius:9px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+.f{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.f .full{grid-column:1/-1}
+.add{background:var(--pr);color:#fff;border:0;border-radius:10px;padding:10px;font-weight:600}
+.ml{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
+.ml small{color:var(--mu);display:block}
+.adv{color:var(--A)}.pay{color:var(--P)}
+.x{background:none;border:0;color:var(--mu);font-size:18px;padding:4px 8px}.x.conf{background:var(--A);color:#fff;border-radius:8px;font-size:13px;font-weight:700}.x.conf::after{content:" पक्का हटाएं?"}
+h3{margin:0 0 6px;font-size:15px}.acc{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}.ch{white-space:nowrap;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px;padding:7px 14px;font-weight:600}.ch.on{background:var(--pr);color:#fff;border-color:var(--pr)}.af{gap:6px;margin-bottom:8px}.af input{flex:1}.acc2{display:flex;justify-content:center;gap:10px;margin-bottom:10px}.sm{background:none;border:0;color:var(--mu);font-size:12px;padding:2px 6px}h1{touch-action:manipulation;user-select:none;-webkit-user-select:none;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer}.w{position:relative}.av{width:34px;height:34px;border-radius:50%;background:var(--pr);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}.dd{position:absolute;left:12px;right:12px;top:56px;z-index:15;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px;box-shadow:0 8px 24px rgba(0,0,0,.25)}.dd .acc{flex-direction:column;overflow:visible;padding:0 0 6px}.dd .ch{border-radius:10px;text-align:left}.dd .rw{display:flex;gap:6px;align-items:center;margin-bottom:6px}.dd .rw .ch{flex:1;display:flex;align-items:center;gap:10px;white-space:normal}.av.s{width:30px;height:30px;font-size:14px;flex:none}.av.big{width:56px;height:56px;font-size:24px;flex:none}.x2{background:none;border:0;font-size:18px;padding:6px 10px;color:var(--mu)}.x2.conf{background:var(--A);color:#fff;border-radius:8px;font-size:13px;font-weight:700}.x2.conf::after{content:" पक्का?"}.af{flex-direction:column}.af .add{width:100%}.prw{display:flex;align-items:center;gap:8px}.prw .sm{border:1px solid var(--bd);border-radius:8px;padding:6px 10px;font-size:13px;color:var(--tx)}.fl{position:relative;overflow:hidden;cursor:pointer}.fl input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;font-size:0}.lk{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;overflow-y:auto;padding:20px}.lkb{width:100%;max-width:340px;text-align:center;margin:auto}.lkb h2{margin:10px 0 12px;font-size:20px}.lkb input{text-align:center;font-size:20px;letter-spacing:6px}.emr{display:flex;gap:6px;flex-wrap:wrap}.emr button{font-size:20px;border:1px solid var(--bd);background:var(--bg);border-radius:50%;width:40px;height:40px;padding:0}.emr button.on{border-color:var(--pr);box-shadow:0 0 0 2px var(--pr)}.av.st{box-shadow:0 0 0 2px var(--bg),0 0 0 5px #d6249f}.cm{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:#222}.cmb{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}.cmb textarea{width:100%;height:60%;background:transparent;border:0;color:#fff;font-size:26px;font-weight:600;text-align:center;resize:none;outline:none;text-shadow:0 1px 6px rgba(0,0,0,.5)}.cmb textarea::placeholder{color:rgba(255,255,255,.7)}.cmt{display:flex;align-items:center;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:#111;flex-wrap:wrap}.cols{display:flex;gap:6px;min-width:100%}.cols button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;padding:0}.cmt .sm{color:#fff;border:1px solid #666;border-radius:8px;padding:8px 12px}.sv{position:fixed;inset:0;z-index:70;background:#000;color:#fff}.svc{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:70px 30px;text-align:center;font-size:26px;font-weight:600;text-shadow:0 1px 6px rgba(0,0,0,.5);white-space:pre-wrap}.svh{position:absolute;top:calc(env(safe-area-inset-top,0px) + 22px);left:12px;right:12px;display:flex;align-items:center;gap:8px;z-index:4}.svh button{background:none;border:0;color:#fff;font-size:20px;padding:6px}.svh small{opacity:.8}.svp{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);left:12px;right:12px;display:flex;gap:4px;z-index:4}.svp i{flex:1;height:3px;background:rgba(255,255,255,.35);border-radius:2px;overflow:hidden}.svp i b{display:block;height:100%;background:#fff}.svnav{position:absolute;inset:70px 0 0 0;display:flex;z-index:2}.svnav div{flex:1}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.ov.on{display:flex}
+.sh{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.sb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.sb button{border:0;border-radius:10px;padding:13px;color:#fff;font-weight:600;font-size:15px}
+textarea{width:100%;height:70px;font-size:12px;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:9px;padding:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.g2 button{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:9px;padding:8px}
+.empty{color:var(--mu);text-align:center;padding:8px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1 id="h1"><span class="av" id="av">P</span><span id="hn">Prince Orviel</span><span id="cv" style="font-size:14px;color:var(--mu)"></span></h1>
+<div class="dd" id="dd" style="display:none">
+<div class="acc" id="acc"></div>
+<div class="af" id="af" style="display:none"><div class="prw"><span class="av big" id="pv2" style="cursor:pointer">+</span><label class="sm fl" id="pb">📷 फोटो चुनो<input type="file" id="pf" accept="image/*"></label><label class="sm fl" id="pb2">🤳 कैमरा<input type="file" id="pf2" accept="image/*" capture="user"></label><button class="sm" id="prm" type="button">हटाओ</button></div>
+<div id="phs" style="font-size:12px;color:var(--mu)">फोटो न खुले तो नीचे से कोई निशान चुन लो</div>
+<div class="emr" id="emr"></div>
+<input type="text" id="an" placeholder="नाम">
+<input type="tel" inputmode="tel" id="ap" placeholder="मोबाइल नंबर (optional)">
+<input type="email" id="ae" placeholder="Gmail / Email (optional)">
+<input type="text" inputmode="numeric" autocomplete="off" style="-webkit-text-security:disc" maxlength="6" id="apin" placeholder="PIN (4-6 अंक) — दूसरों से data बचाने के लिए">
+<button class="sm" id="pinrm" type="button" style="display:none">🔓 PIN हटाओ</button><button class="add" id="ab">सेव</button></div>
+<div class="acc2" id="acc2" style="display:none"><button class="sm" id="cl">✖ बंद</button><button class="sm" id="stb">➕ Status</button><button class="sm" id="ren">✏️ प्रोफ़ाइल बदलो</button><button class="sm" id="del">🗑 Account हटाओ</button></div>
+
+</div>
+<div class="card">
+  <div class="mon"><button class="nb" id="pv">‹</button><b id="mt"></b><button class="nb" id="nx">›</button></div>
+  <div class="grid" id="hd"></div>
+  <div class="grid" id="cal"></div>
+  <div class="leg"><span><i style="background:var(--P)"></i>Present</span><span><i style="background:var(--A)"></i>Absent</span><span><i style="background:var(--L)"></i>Leave</span><span><i style="background:var(--H)"></i>Half Leave</span><span><i style="background:var(--O)"></i>छुट्टी (रविवार/त्योहार)</span></div>
+  <div class="empty" style="text-align:left;padding:6px 0 0">रविवार और सरकारी छुट्टी अपने आप &#39;छुट्टी&#39; दिखती है। उस दिन काम किया हो तो दिन पर tap करके Present लगा दो।</div><button class="qa" id="qa">✅ आज Present लगाओ</button>
+</div>
+
+<div class="card">
+  <h3 id="hh">हिसाब</h3>
+  <div class="empty" style="text-align:left;padding:0 0 4px">तारीख बदलकर उस तारीख तक का हिसाब देखो</div>
+  <input type="date" id="ud" style="margin-bottom:10px">
+  
+  <div class="sum" id="sm"></div>
+  <div style="margin-top:10px">
+    <label style="font-size:13px;color:var(--mu)">महीने की सैलरी (₹)</label>
+    <input type="number" inputmode="decimal" id="sal" placeholder="जैसे 12000">
+    
+    
+  </div>
+  <div id="calc" style="margin-top:8px"></div>
+</div>
+
+<div class="card" style="display:none">
+  <h3>Advance / Payment की list</h3>
+  <div class="empty" style="text-align:left;padding:0 0 4px">Advance या Payment जोड़ने या बदलने के लिए कैलेंडर में तारीख पर tap करो।</div>
+  <div class="f" style="display:none">
+    <select id="mtp"><option value="adv">Advance (लिया)</option><option value="pay">Payment (मिली)</option></select>
+    <input type="number" inputmode="decimal" id="amt" placeholder="रकम ₹">
+    <input type="date" id="md">
+    <input type="text" id="mn" placeholder="नोट (optional)">
+    <button class="add full" id="ma">➕ जोड़ो</button>
+  </div>
+  <div id="ml" style="margin-top:8px"></div>
+</div>
+
+<div class="card">
+  <h3>Backup</h3>
+  <textarea id="bk" placeholder="Backup यहां आएगा / Restore के लिए यहां paste करो"></textarea>
+  <div class="g2"><button id="bm">Backup बनाओ</button><button id="br">Restore करो</button></div><button class="add" id="brc" style="width:100%;margin-top:8px">📋 कॉपी किया data सीधे Restore करो</button>
+</div>
+</div>
+
+<div class="cm" id="cm" style="display:none"><div class="cmb" id="cmb"><textarea id="ct" maxlength="140" placeholder="अपना status लिखो…"></textarea></div><div class="cmt"><div class="cols" id="cols"></div><label class="sm fl" id="cp">📷 फोटो<input type="file" id="cpf" accept="image/*"></label><button class="add" id="cpost" type="button">✔ लगाओ</button><button class="sm" id="ccl" type="button">✖ बंद</button></div></div>
+<div class="sv" id="sv" style="display:none"><div class="svc" id="svc"></div><div class="svnav"><div id="svl"></div><div id="svr"></div></div><div class="svp" id="svp"></div><div class="svh"><span id="sva"></span><b id="svn"></b><small id="svt"></small><span style="flex:1"></span><button id="svd" type="button">🗑</button><button id="svx" type="button">✖</button></div></div>
+<div class="lk" id="lk" style="display:none"><div class="lkb"><div id="lka" style="display:flex;justify-content:center"></div><h2 id="lkn"></h2><input type="text" inputmode="numeric" id="lkp" autocomplete="off" style="-webkit-text-security:disc" placeholder="PIN डालो" maxlength="6"><div id="lke" style="color:var(--A);font-size:13px;min-height:20px;margin:6px 0"></div><button class="add" id="lkb" style="width:100%">🔓 खोलो</button><button class="sm" id="lkf" type="button" style="margin-top:10px">🔑 PIN भूल गए?</button><div id="lkr" style="display:none;margin-top:10px"><div id="lkt" style="font-size:12px;color:var(--mu);margin-bottom:6px"></div><input type="text" id="rpw" inputmode="numeric" autocomplete="off" placeholder="नंबर डालो"><button class="add" id="lkx" style="width:100%;margin-top:8px">रीसेट करो</button></div><div id="lko" style="margin-top:16px"></div></div></div>
+<div class="ov" id="ov"><div class="sh">
+  <b id="sd"></b>
+  <div class="sb">
+    <button style="background:var(--P)" data-s="P">✅ Present</button>
+    <button style="background:var(--A)" data-s="A">❌ Absent</button>
+    <button style="background:var(--L)" data-s="L">🌴 Leave</button>
+    <button style="background:var(--H)" data-s="H">🌗 Half Leave</button>
+    <button style="background:var(--O)" data-s="O">🎉 छुट्टी</button>
+  </div>
+  <div class="g2" style="margin:0 0 8px"><input type="number" inputmode="decimal" id="sa" placeholder="Advance ₹"><input type="number" inputmode="decimal" id="sp" placeholder="Payment ₹"></div>
+  <input type="text" id="sn" placeholder="नोट (optional)">
+  <button class="add" id="ss" style="width:100%;margin-top:8px">💾 सिर्फ़ Advance/नोट सेव करो</button>
+  <div class="g2"><button id="sc">Advance हटाओ</button><button id="st">Status हटाओ</button><button id="sx">बंद करो</button></div>
+</div></div>
+
+<script>
+var KEY='meri_hazri_v1',root={cur:'a1',accts:[{id:'a1',name:'Prince Orviel',days:{},money:[],sal:{}}]},db;
+try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r);if(p&&p.accts&&p.accts.length)root=p;else if(p&&p.days)root.accts[0]={id:'a1',name:'Prince Orviel',days:p.days,money:p.money||[],sal:p.sal||{}};}}catch(e){}
+function pick(){db=root.accts.filter(function(a){return a.id===root.cur})[0]||root.accts[0];root.cur=db.id;if(!db.name)db.name='Staff';if(!db.money)db.money=[];if(!db.sal)db.sal={};if(!db.days)db.days={}}
+pick();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(root));}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+var MN=['January','February','March','April','May','June','July','August','September','October','November','December'];var MNx=['जनवरी','फ़रवरी','मार्च','अप्रैल','मई','जून','जुलाई','अगस्त','सितंबर','अक्टूबर','नवंबर','दिसंबर'];
+var WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];var WDx=['र','सो','मं','बु','गु','शु','श'];
+var LB={P:'Present',A:'Absent',L:'Leave',H:'Half',O:'छुट्टी'};
+var FIX={'01-26':'गणतंत्र दिवस','08-15':'स्वतंत्रता दिवस','10-02':'गांधी जयंती','12-25':'क्रिसमस'};
+var HOL={'2026-03-04':'होली','2026-11-08':'दिवाली','2027-03-10':'ईद-उल-फ़ित्र','2027-03-23':'होली','2027-03-26':'गुड फ़्राइडे','2027-10-29':'दिवाली'};
+function hname(k){return HOL[k]||FIX[k.slice(5)]||''}
+function eff(k,dw){var e=db.days[k];if(e&&e.s)return e.s;return(dw===0||hname(k))?'O':''}
+var now=new Date(),Y=now.getFullYear(),M=now.getMonth(),sel=null,UT=null,delId=null,dt=null;
+function pad(n){return n<10?'0'+n:''+n}
+function key(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d)}
+function ym(){return Y+'-'+pad(M+1)}
+function rs(n){return '₹'+Math.round(n).toLocaleString('en-IN')}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+$('hd').innerHTML=WD.map(function(w){return '<div class="dh">'+w+'</div>'}).join('');
+
+var delA=false,afMode='add',adt=null,accOpen=true;
+function drawAcc(){
+  $('acc').innerHTML=root.accts.filter(function(a){return accOpen||a.id===root.cur}).map(function(a){return '<div class="rw"><button class="ch'+(a.id===root.cur?' on':'')+'" data-a="'+a.id+'">'+avh(a,'s')+'<span>'+esc(a.name)+((a.ph||a.em)&&(!a.pin||unl[a.id])?'<small style="display:block;opacity:.75;font-size:11px;font-weight:400">'+esc(a.ph||'')+((a.ph&&a.em)?' · ':'')+esc(a.em||'')+'</small>':'')+'</span>'+'</button><button class="x2" data-e="'+a.id+'">✏️</button>'+(root.accts.length>1?'<button class="x2'+(String(delA2)===String(a.id)?' conf':'')+'" data-d="'+a.id+'">🗑</button>':'')+'</div>'}).join('');
+  $('hn').textContent=db.name;$('av').textContent=db.photo?'':(db.emo||(db.name.trim().charAt(0)||'?').toUpperCase());$('av').style.background=db.photo?"#ddd url('"+db.photo+"') center/cover":'hsl('+((root.accts.indexOf(db)*70+245)%360)+',55%,48%)';$('cv').textContent=root.accts.length>1?'▾':'';$('av').className='av'+(liveSt(db).length?' st':'');$('acc').style.display=root.accts.length>1?'flex':'none';
+  $('del').style.display=root.accts.length>1?'':'none';
+  $('del').textContent=delA?'पक्का हटाएं? दोबारा दबाओ':'🗑 Account हटाओ';
+}
+function render(){ddClose();chkLock();
+  drawAcc();
+  $('mt').textContent=MN[M]+' '+Y;
+  var first=new Date(Y,M,1).getDay(),dim=new Date(Y,M+1,0).getDate(),h='';
+  var tdk=key(now.getFullYear(),now.getMonth(),now.getDate()),ms=key(Y,M,1),me=key(Y,M,dim);
+  if(!UT||UT<ms||UT>me)UT=(tdk>=ms&&tdk<=me)?tdk:me;
+  $('ud').value=UT;$('ud').min=ms;$('ud').max=me;$('hh').textContent=db.name+' का हिसाब — '+UT.split('-').reverse().join('/')+' तक';
+  var td=key(now.getFullYear(),now.getMonth(),now.getDate());
+  for(var i=0;i<first;i++)h+='<div></div>';
+  var c={P:0,A:0,L:0,H:0,O:0},ws=0,W=0;
+  for(var d=1;d<=dim;d++){
+    var k=key(Y,M,d),s=eff(k,new Date(Y,M,d).getDay());
+    if(new Date(Y,M,d).getDay()!==0){W++;if(k<=UT){ws++;if(s)c[s]++}}
+    h+='<button class="d '+s+(k===td?' today':'')+'" data-k="'+k+'">'+d+(hasM(k)?'<i class="m">₹</i>':'')+'<small>'+(s==='O'?'छु':s)+'</small></button>';
+  }
+  $('cal').innerHTML=h;
+  $('sm').innerHTML=['P','A','L','H','O'].map(function(s){return '<div><b style="color:var(--'+s+')">'+c[s]+'</b><span>'+LB[s]+'</span></div>'}).join('');
+  var m=db.money.filter(function(x){return x.d.slice(0,7)===ym()}).sort(function(a,b){return a.d<b.d?1:-1});
+  var adv=0,pay=0;
+  m.forEach(function(x){if(x.d>UT)return;if(x.t==='adv')adv+=x.a;else pay+=x.a});
+  var sal=db.sal[ym()]||0;
+  $('sal').value=sal||'';
+  var per=sal?sal/W:0,pd=c.P+c.O+c.H*0.5,um=Math.max(0,ws-c.P-c.A-c.L-c.H-c.O),gross=per*pd,net=gross-adv-pay;
+  $('calc').innerHTML=
+    (sal?'<div class="row"><span>महीने की सैलरी (÷ '+W+' दिन)</span><span>'+rs(sal)+'</span></div><div class="row"><span>'+ws+' दिन (रविवार छोड़कर) × '+rs(per)+'</span><span>'+rs(per*ws)+'</span></div><div class="row"><span>Absent '+c.A+' दिन × '+rs(per)+'</span><span class="adv">− '+rs(per*c.A)+'</span></div><div class="row"><span>Leave '+c.L+' + Half '+c.H+' + बिना entry '+um+' दिन</span><span class="adv">− '+rs(per*(c.L+c.H*0.5+um))+'</span></div><div class="row"><span>कमाई ('+pd+' दिन)</span><span>'+rs(gross)+'</span></div>':'')+
+    
+    '<div class="row"><span>Advance लिया</span><span class="adv">− '+rs(adv)+'</span></div>'+
+    '<div class="row"><span>Payment मिली</span><span class="pay">− '+rs(pay)+'</span></div>'+
+    (sal?'<div class="row tot"><span>बाकी (इस तारीख तक)</span><span>'+rs(net)+'</span></div>':'<div class="empty">सैलरी भरो तो बाकी पैसा दिखेगा</div>');
+  $('ml').innerHTML=m.length?m.map(function(x){
+    return '<div class="ml"><div><b class="'+x.t+'">'+(x.t==='adv'?'Advance':'Payment')+' '+rs(x.a)+'</b><small>'+x.d.split('-').reverse().join('/')+(x.n?' · '+esc(x.n):'')+'</small></div><button class="x'+(String(delId)===String(x.id)?' conf':'')+'" data-del="'+x.id+'">🗑</button></div>';
+  }).join(''):'<div class="empty">इस महीने कोई entry नहीं</div>';
+  
+  
+}
+function msum(k,t){var s=0;db.money.forEach(function(x){if(x.d===k&&x.t===t)s+=x.a});return s}
+function hasM(k){return db.money.some(function(x){return x.d===k})}
+function saveM(k){
+  ['adv','pay'].forEach(function(t){
+    var v=parseFloat($(t==='adv'?'sa':'sp').value)||0;
+    db.money=db.money.filter(function(x){return !(x.d===k&&x.t===t)});
+    if(v>0)db.money.push({id:Date.now()+(t==='adv'?1:2),t:t,a:v,d:k,n:''});
+  });
+}
+function openSheet(k){
+  sel=k;var e=db.days[k]||{};
+  var dw=new Date(k+'T00:00:00').getDay(),s0=eff(k,dw),hn=hname(k)||(dw===0?'रविवार':'');
+  $('sd').textContent=k.split('-').reverse().join('/')+(s0?' — '+LB[s0]:'')+(s0==='O'&&hn?' ('+hn+')':'');
+  $('sn').value=e.n||'';$('sa').value=msum(k,'adv')||'';$('sp').value=msum(k,'pay')||'';$('ov').classList.add('on');
+}
+function setS(s){
+  db.days[sel]={s:s,n:$('sn').value.trim()};saveM(sel);save();$('ov').classList.remove('on');render();
+}
+$('acc').onclick=function(ev){var sa=ev.target.closest('.av.st');if(sa){openSt(sa.dataset.sa);return}var b=ev.target.closest('button');if(!b)return;
+  if(b.dataset.e){editAcc(b.dataset.e);return}if(b.dataset.d){delAcc(b.dataset.d);return}if(b.id==='addA'){afMode='add';$('an').value='';$('af').style.display='flex';$('an').focus();return}
+  if(b.dataset.a){ddClose();if(b.dataset.a===root.cur)return;root.cur=b.dataset.a;pick();delA=false;$('af').style.display='none';$('acc2').style.display='none';UT=null;save();render()}};
+$('ab').onclick=function(){var n=$('an').value.trim();if(!n)return;
+  if(afMode==='add'){var id='a'+Date.now();root.accts.push({id:id,name:n,ph:$('ap').value.trim(),em:$('ae').value.trim(),photo:tmpP,emo:tmpE,pin:($('apin').value.trim()?hp($('apin').value.trim()):''),days:{},money:[],sal:{}});root.cur=id;pick();UT=null;unl[id]=true}else{unl[db.id]=true;db.name=n;db.ph=$('ap').value.trim();db.em=$('ae').value.trim();db.photo=tmpP;db.emo=tmpE;if($('apin').value.trim())db.pin=hp($('apin').value.trim());else if(clrPin)db.pin=''}
+  $('af').style.display='none';$('acc2').style.display='none';save();render()};
+$('ren').onclick=function(){clrPin=false;$('apin').value='';$('pinrm').style.display=db.pin?'':'none';$('pinrm').textContent='🔓 PIN हटाओ';afMode='ren';$('an').value=db.name;$('ap').value=db.ph||'';$('ae').value=db.em||'';tmpP=db.photo||'';tmpE=db.emo||'';drawPrev();$('af').style.display='flex';$('an').focus()};
+$('del').onclick=function(){if(!delA){delA=true;drawAcc();clearTimeout(adt);adt=setTimeout(function(){delA=false;drawAcc()},3000);return}
+  root.accts=root.accts.filter(function(a){return a.id!==root.cur});root.cur=root.accts[0].id;pick();delA=false;UT=null;$('af').style.display='none';$('acc2').style.display='none';save();render()};
+var lt=0;function dbl(){var t=Date.now();if(t-lt<500){lt=0;return true}lt=t;return false}function ddClose(){$('dd').style.display='none';$('af').style.display='none';$('acc2').style.display='none'}var delA2=null,tmpP='',tmpE='',dt2=null,clrPin=false,unl={};
+var CL=['#6d28d9','#db2777','#059669','#d97706','#2563eb','#111827'],cmBg=CL[0],cmImg='',sv={a:null,L:[],i:0,tm:null},svdc=false;
+function liveSt(a){var n=Date.now();return (a.stories||[]).filter(function(s){return n-s.ts<86400000})}
+function ago(t){var m=Math.floor((Date.now()-t)/60000);return m<1?'अभी':m<60?m+' मिनट पहले':Math.floor(m/60)+' घंटे पहले'}
+function paintCm(){$('cmb').style.background=cmImg?"url('"+cmImg+"') center/cover":cmBg}
+function openCmp(){cmBg=CL[0];cmImg='';$('ct').value='';paintCm();$('cm').style.display='flex';$('ct').focus()}
+function openSt(id){var a=root.accts.filter(function(x){return x.id===id})[0];if(!a)return;var L=liveSt(a);if(!L.length)return;sv.a=a;sv.L=L;sv.i=0;$('sv').style.display='block';showSt()}
+function showSt(){clearTimeout(sv.tm);svdc=false;$('svd').textContent='🗑';var s=sv.L[sv.i];$('svc').style.background=s.img?"url('"+s.img+"') center/cover":s.bg;$('svc').textContent=s.txt||'';$('svp').innerHTML=sv.L.map(function(x,k){return '<i><b style="width:'+(k<=sv.i?100:0)+'%"></b></i>'}).join('');$('sva').innerHTML=avh(sv.a,'s');$('svn').textContent=sv.a.name;$('svt').textContent=ago(s.ts);$('svd').style.display=(sv.a.id===db.id)?'':'none';sv.tm=setTimeout(nextSt,5000)}
+function nextSt(){if(sv.i<sv.L.length-1){sv.i++;showSt()}else closeSt()}
+function closeSt(){clearTimeout(sv.tm);$('sv').style.display='none'}
+function hp(s){s=String(s).trim().replace(/[\u0966-\u096f]/g,function(d){return d.charCodeAt(0)-2406});var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)}
+function chkLock(){var lk=$('lk');if(db.pin&&!unl[db.id]){$('lka').innerHTML=avh(db,'big');$('lkn').textContent=db.name;$('lkp').value='';$('lke').textContent='';$('lkr').style.display='none';$('lko').innerHTML=(root.accts.length>1?'<div style="font-size:12px;color:var(--mu);margin-bottom:4px">दूसरा account खोलो</div>':'')+root.accts.filter(function(a){return a.id!==db.id}).map(function(a){return '<button class="ch" style="margin:3px" data-s="'+a.id+'">'+esc(a.name)+'</button>'}).join('');lk.style.display='flex'}else lk.style.display='none'}
+function openEdit(){clrPin=false;$('apin').value='';$('pinrm').style.display=db.pin?'':'none';$('pinrm').textContent='🔓 PIN हटाओ';$('dd').style.display='block';afMode='ren';$('an').value=db.name;$('ap').value=db.ph||'';$('ae').value=db.em||'';tmpP=db.photo||'';tmpE=db.emo||'';drawPrev();$('af').style.display='flex';$('acc2').style.display='flex'}
+function editAcc(id){if(id!==root.cur){root.cur=id;pick();UT=null;save();render()}openEdit()}
+function delAcc(id){if(String(delA2)!==String(id)){delA2=id;drawAcc();clearTimeout(dt2);dt2=setTimeout(function(){delA2=null;drawAcc()},3000);return}delA2=null;if(root.accts.length<2)return;var tg=root.accts.filter(function(a){return a.id===id})[0];if(tg&&tg.pin&&!unl[id]){root.cur=id;pick();UT=null;render();return}root.accts=root.accts.filter(function(a){return a.id!==id});if(root.cur===id)root.cur=root.accts[0].id;pick();UT=null;save();render()}
+function avh(a,c){var i=root.accts.indexOf(a),bg=a.photo?"background:#ddd url('"+a.photo+"') center/cover":'background:hsl('+((i*70+245)%360)+',55%,48%)';return '<span class="av '+(c||'')+(liveSt(a).length?' st':'')+'" data-sa="'+a.id+'" style="'+bg+'">'+(a.photo?'':(a.emo||esc((a.name||'?').trim().charAt(0).toUpperCase())))+'</span>'}
+function drawPrev(){var p=$('pv2');p.textContent=tmpP?'':(tmpE||(($('an').value.trim().charAt(0))||'+').toUpperCase());Array.prototype.forEach.call($('emr').children,function(b){b.className=b.dataset.e===tmpE?'on':''});p.style.background=tmpP?"#ddd url('"+tmpP+"') center/cover":'var(--pr)'}
+function openAdd(){clrPin=false;$('apin').value='';$('pinrm').style.display='none';$('dd').style.display='block';afMode='add';$('an').value='';$('ap').value='';$('ae').value='';tmpP='';tmpE='';drawPrev();$('af').style.display='flex';$('acc2').style.display='flex';$('an').focus()}
+$('h1').onclick=function(){if(dbl()){openAdd();return}if($('dd').style.display!=='none'){ddClose();return}if(root.accts.length>1)$('dd').style.display='block'};
+$('cl').onclick=ddClose;
+$('pinrm').onclick=function(){clrPin=true;this.textContent='✔ सेव दबाओगे तो PIN हट जाएगा'};
+$('lkb').onclick=function(){var v=$('lkp').value.trim(),ow=root.accts[0];if(hp(v)===db.pin||(db.id!==ow.id&&ow.pin&&hp(v)===ow.pin)){unl[db.id]=true;render()}else{$('lke').textContent='PIN गलत है';$('lkp').value=''}};
+$('brc').onclick=async function(){try{var t=await navigator.clipboard.readText();$('bk').value=t;$('br').click()}catch(e){$('bk').placeholder='यहाँ लंबा दबाकर Paste करो, फिर Restore करो दबाओ';$('bk').focus()}};
+$('lkp').onkeydown=function(e){if(e.key==='Enter')$('lkb').click()};
+$('cols').innerHTML=CL.map(function(c){return '<button type="button" data-c="'+c+'" style="background:'+c+'"></button>'}).join('');
+$('cols').onclick=function(ev){var b=ev.target.closest('button');if(!b)return;cmBg=b.dataset.c;cmImg='';paintCm()};
+$('av').onclick=function(ev){ev.stopPropagation();if(liveSt(db).length)openSt(db.id);else openCmp()};
+$('stb').onclick=function(){ddClose();openCmp()};
+$('ccl').onclick=function(){$('cm').style.display='none'};
+$('cpost').onclick=function(){var t=$('ct').value.trim();if(!t&&!cmImg)return;if(!db.stories)db.stories=[];db.stories.push({id:'s'+Date.now(),txt:t,bg:cmBg,img:cmImg,ts:Date.now()});db.stories=db.stories.slice(-8);save();$('cm').style.display='none';drawAcc()};
+$('cpf').onchange=function(){var f=this.files&&this.files[0],inp=this;if(!f)return;var rd=new FileReader();rd.onload=function(){var im=new Image();im.onload=function(){var w=Math.min(540,im.width),h=Math.round(im.height*w/im.width),c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);cmImg=c.toDataURL('image/jpeg',0.7);paintCm()};im.src=rd.result};rd.readAsDataURL(f);inp.value=''};
+$('svl').onclick=function(){if(sv.i>0)sv.i--;showSt()};
+$('svr').onclick=nextSt;
+$('svx').onclick=closeSt;
+$('svd').onclick=function(){if(!svdc){svdc=true;this.textContent='पक्का?';clearTimeout(sv.tm);return}var s=sv.L[sv.i];db.stories=(db.stories||[]).filter(function(x){return x.id!==s.id});save();sv.L=liveSt(db);drawAcc();if(!sv.L.length){closeSt();return}if(sv.i>=sv.L.length)sv.i=sv.L.length-1;showSt()};
+$('lkf').onclick=function(){var own=db.id===root.accts[0].id;window.rcode=String(Math.floor(1000+Math.random()*9000));$('lkt').textContent=own?'यह नंबर नीचे डालो: '+window.rcode+' (इस account का PIN हट जाएगा)':'मालिक ('+root.accts[0].name+') का PIN डालो';$('rpw').value='';$('lkr').style.display='block';$('rpw').style.webkitTextSecurity=own?'none':'disc';$('rpw').focus();$('rpw').scrollIntoView({block:'center'})};
+$('lkx').onclick=function(){var ow=root.accts[0],v=$('rpw').value.trim();
+  if(db.id===ow.id){if(v!==String(window.rcode)){$('lke').textContent='नंबर गलत है';return}}
+  else if(ow.pin&&hp(v)!==ow.pin){$('lke').textContent='मालिक का PIN गलत है';return}
+  db.pin='';unl[db.id]=true;save();render()};
+var EM=['😀','😎','👨','👩','🧔','👳','🧕','🐯'];
+$('emr').innerHTML=EM.map(function(e){return '<button type="button" data-e="'+e+'">'+e+'</button>'}).join('');
+$('emr').onclick=function(ev){var b=ev.target.closest('button');if(!b)return;tmpE=(tmpE===b.dataset.e)?'':b.dataset.e;tmpP='';drawPrev()};
+$('lko').onclick=function(ev){var b=ev.target.closest('button');if(!b)return;root.cur=b.dataset.s;pick();UT=null;save();render()};
+$('prm').onclick=function(){tmpP='';drawPrev()};
+$('an').oninput=drawPrev;
+$('pf').onchange=$('pf2').onchange=function(){var f=this.files&&this.files[0],inp=this;if(!f)return;$('phs').textContent='फोटो पढ़ रहे हैं…';
+  var rd=new FileReader();rd.onload=function(){var im=new Image();im.onerror=function(){$('phs').textContent='✖ यह फोटो नहीं खुली, दूसरी चुनो'};im.onload=function(){
+    var s=160,c=document.createElement('canvas');c.width=s;c.height=s;
+    var m=Math.min(im.width,im.height);
+    c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,s,s);
+    tmpP=c.toDataURL('image/jpeg',0.8);tmpE='';if(afMode==='ren'){db.photo=tmpP;db.emo='';save();drawAcc()}$('phs').textContent='✔ फोटो मिल गई, अब सेव दबाओ';drawPrev()};im.src=rd.result};
+  rd.readAsDataURL(f);inp.value=''};
+$('pv').onclick=function(){M--;if(M<0){M=11;Y--}render()};
+$('nx').onclick=function(){M++;if(M>11){M=0;Y++}render()};
+$('cal').onclick=function(ev){var b=ev.target.closest('.d');if(b)openSheet(b.dataset.k)};
+$('qa').onclick=function(){
+  var k=key(now.getFullYear(),now.getMonth(),now.getDate());
+  db.days[k]={s:'P',n:(db.days[k]&&db.days[k].n)||''};save();
+  Y=now.getFullYear();M=now.getMonth();render();
+};
+document.querySelectorAll('.sb button').forEach(function(b){b.onclick=function(){setS(b.dataset.s)}});
+$('sc').onclick=function(){db.money=db.money.filter(function(x){return x.d!==sel});save();$('ov').classList.remove('on');render()};
+$('st').onclick=function(){delete db.days[sel];save();$('ov').classList.remove('on');render()};
+$('ss').onclick=function(){var e=db.days[sel]||{},n=$('sn').value.trim();if(e.s||n)db.days[sel]={s:e.s||'',n:n};saveM(sel);save();$('ov').classList.remove('on');render()};
+$('sx').onclick=function(){$('ov').classList.remove('on')};
+$('ov').onclick=function(ev){if(ev.target===$('ov'))$('ov').classList.remove('on')};
+$('ud').onchange=function(){if(this.value)UT=this.value;render()};
+
+$('sal').onchange=function(){db.sal[ym()]=parseFloat($('sal').value)||0;save();render()};
+$('ma').onclick=function(){
+  var a=parseFloat($('amt').value);if(!a||a<=0||!$('md').value)return;
+  db.money.push({id:Date.now(),t:$('mtp').value,a:a,d:$('md').value,n:$('mn').value.trim()});
+  save();$('amt').value='';$('mn').value='';render();
+};
+$('ml').onclick=function(ev){
+  var b=ev.target.closest('[data-del]');if(!b)return;
+  if(String(delId)!==b.dataset.del){delId=b.dataset.del;render();clearTimeout(dt);dt=setTimeout(function(){delId=null;render()},3000);return}delId=null;
+  db.money=db.money.filter(function(x){return String(x.id)!==b.dataset.del});save();render();
+};
+$('bm').onclick=function(){$('bk').value=JSON.stringify(root);$('bk').select();try{document.execCommand('copy')}catch(e){}try{navigator.clipboard.writeText($('bk').value)}catch(e){}};
+$('br').onclick=function(){
+  try{var p=JSON.parse($('bk').value);if(!p||!p.accts)throw 0;
+    
+    root=p;pick();save();render();$('bk').value='';
+  }catch(e){$('bk').value='';$('bk').placeholder='Backup सही नहीं है, दोबारा paste करो'}
+};
+render();
+</script>
+</body>
+</html>

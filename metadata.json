@@ -1,0 +1,8 @@
+{
+  "name": "Attendance",
+  "description": "Attendance, salary calculator, advance/payment ledger, and multi-account staff tracker with offline support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

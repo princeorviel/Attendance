@@ -1,11 +1,77 @@
-<div align="center">
+# Attendance — हाज़िरी व सैलरी हिसाब App (PWA)
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+स्टाफ़ हाज़िरी, सैलरी कैलकुलेटर, एडवांस/पेमेंट लेजर, मल्टी-ब्रांच Shop मैनेजमेंट और ऑफ़लाइन सपोर्ट के साथ **इंस्टॉल होने वाला मोबाइल Web App (PWA)**।
 
-  <h1>Built with AI Studio</h2>
+---
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## मुख्य फ़ीचर्स (Key Features)
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+- **100% अलग Multi-Shopkeeper Isolation (पूर्ण डेटा प्राइवेसी):**
+  - हर Shopkeeper की Shop, स्टाफ़, हाज़िरी, सैलरी और हिसाब Firestore Security Rules के स्तर पर पूरी तरह अलग रहते हैं।
+  - किसी भी दूसरे Shopkeeper या उसके स्टाफ़ को आपकी Shop का नाम, स्टाफ़ या कोई भी डेटा कभी नहीं दिखता और न ही एक्सेस होता है।
+  - एक Shopkeeper के अंदर भी हर Staff को केवल अपना खुद का निजी डेटा दिखता है।
+- **Multi-Branch / Multiple Shops:** एक ही अकाउंट से एक से ज़्यादा Shops / Branches बनाएं और 1 क्लिक में स्विच करें।
+- **Granular Manager Permissions:** Owner किसी भी स्टाफ़ को Manager बनाकर सीमित अधिकार (हाज़िरी, अनुरोध मंज़ूरी, एडवांस/पेमेंट, सैलरी बदलाव, स्टाफ़ जोड़/हटाएं) दे सकता है।
+- **Staff Self-Service:** स्टाफ़ GPS लोकेशन व सेल्फ़ी के साथ Punch-In/Out और छुट्टी (Leave) का अनुरोध भेज सकते हैं, जिसे Owner/Manager 1 क्लिक में मंज़ूर या रद्द कर सकते हैं।
+- **Salary, Carry-Forward & PDF Ledger:** ऑटोमैटिक महीने की सैलरी गणना, कैरी-फ़ॉरवर्ड बैलेंस, प्रिंट/PDF स्टेटमेंट और इन-ऐप / WhatsApp शेयर।
+- **Shop व Shopkeeper ID Delete:** Owner किसी एक Shop को या अपनी पूरी Shopkeeper ID को 2-step कन्फ़र्मेशन के साथ हमेशा के लिए डिलीट कर सकता है।
+- **Mobile App (PWA) + Offline Mode:** Android, iPhone और Desktop पर होम स्क्रीन ऐप की तरह इंस्टॉल होता है, Home Screen Shortcuts सपोर्ट करता है और ऑफ़लाइन भी चलता है।
 
-</div>
+---
+
+## लोकल सेटअप (Local Setup)
+
+```bash
+npm install
+npm run dev
+```
+
+प्रोडक्शन बिल्ड और TypeScript जाँच के लिए:
+
+```bash
+npm run lint
+npm run build
+```
+
+---
+
+## GitHub पर कैसे डालें और Live होस्ट करें
+
+### 1. GitHub Repository में Push करें
+
+```bash
+git init
+git add .
+git commit -m "Initial Attendance PWA release"
+git branch -M main
+git remote add origin https://github.com/<YOUR_USERNAME>/<YOUR_REPO>.git
+git push -u origin main
+```
+
+हर `push` पर `.github/workflows/build-and-deploy.yml` अपने-आप TypeScript चेक और Production PWA build (`dist/`) तैयार कर देगा।
+
+### 2. Live Web App होस्ट करें (Vercel / Netlify / Firebase Hosting)
+
+- **Vercel / Netlify:** अपनी GitHub रिपॉजिटरी जोड़ें → Build Command `npm run build` और Output Directory `dist` रखें → Deploy करें।
+- **Firebase Auth Domain जोड़ें (ज़रूरी):**
+  - अपने लाइव डोमेन (जैसे `your-app.vercel.app`) को **Firebase Console → Authentication → Settings → Authorized domains** में ज़रूर जोड़ें, ताकि Google Login काम करे।
+- **Firestore Rules Deploy करें:**
+  ```bash
+  firebase deploy --only firestore:rules
+  ```
+
+---
+
+## Android APK / Play Store (.aab) कैसे बनाएं
+
+क्योंकि यह ऐप पूर्ण **PWA Manifest + Service Worker + Maskable Icons** के साथ तैयार है:
+
+1. अपनी लाइव वेबसाइट का HTTPS URL कॉपी करें।
+2. [PWABuilder.com](https://www.pwabuilder.com) पर जाकर अपना URL डालें।
+3. **Package for Stores → Android** चुनें और **Signed APK / Google Play AAB** डाउनलोड करें।
+
+---
+
+## सुरक्षा (Security Note)
+
+सभी Firestore Security Rules `/firestore.rules` में परिभाषित हैं। ऐप को बड़े स्तर पर पब्लिश करने से पहले अपनी आवश्यकताओं के अनुसार `firestore.rules` की समीक्षा ज़रूर करें।

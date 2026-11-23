@@ -1,0 +1,579 @@
+{
+  "entities": {
+    "UserPrivate": {
+      "title": "UserPrivate",
+      "description": "Private user account metadata and active shop pointer.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "photoUrl": {
+          "type": "string",
+          "maxLength": 1000
+        },
+        "activeShopId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "shopIds": {
+          "type": "array",
+          "description": "Bounded list of up to 30 shop IDs created or joined by the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "email", "displayName", "createdAt", "updatedAt"]
+    },
+    "Shop": {
+      "title": "Shop",
+      "description": "Shop workspace owned by a shop owner or manager.",
+      "type": "object",
+      "properties": {
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerEmail": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "joinCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 24,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "managerUids": {
+          "type": "array",
+          "description": "Bounded list of up to 10 manager UIDs authorized by the owner."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["shopId", "name", "ownerUid", "ownerEmail", "joinCode", "managerUids", "createdAt", "updatedAt"]
+    },
+    "ShopMember": {
+      "title": "ShopMember",
+      "description": "Membership record mapping an authenticated user UID to a role and optional linked staffId.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "role": {
+          "type": "string",
+          "enum": ["owner", "manager", "staff"]
+        },
+        "staffId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "permissions": {
+          "type": "object",
+          "description": "Granular manager permissions configured by shop owner."
+        },
+        "joinedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["uid", "shopId", "ownerUid", "email", "displayName", "role", "joinedAt", "updatedAt"]
+    },
+    "StaffDirectory": {
+      "title": "StaffDirectory",
+      "description": "Non-PII teammate profile card inside a shop for following and 24h status stories.",
+      "type": "object",
+      "properties": {
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "managerUids": {
+          "type": "array"
+        },
+        "linkedUid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "photo": {
+          "type": "string",
+          "maxLength": 400000
+        },
+        "emo": {
+          "type": "string",
+          "maxLength": 16
+        },
+        "roleLabel": {
+          "type": "string",
+          "enum": ["owner", "manager", "staff"]
+        },
+        "followersCount": {
+          "type": "number"
+        },
+        "stories": {
+          "type": "array"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["staffId", "shopId", "ownerUid", "managerUids", "name", "roleLabel", "followersCount", "stories", "createdAt", "updatedAt"]
+    },
+    "StaffPrivate": {
+      "title": "StaffPrivate",
+      "description": "Strictly isolated attendance, self-attendance, salary, and advance/payment ledger for one staff account.",
+      "type": "object",
+      "properties": {
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "managerUids": {
+          "type": "array"
+        },
+        "linkedUid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "linkedEmail": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "ph": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "em": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "days": {
+          "type": "object"
+        },
+        "selfDays": {
+          "type": "object"
+        },
+        "money": {
+          "type": "array"
+        },
+        "sal": {
+          "type": "object"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["staffId", "shopId", "ownerUid", "managerUids", "name", "days", "selfDays", "money", "sal", "createdAt", "updatedAt"]
+    },
+    "ShopFollow": {
+      "title": "ShopFollow",
+      "description": "Follow edge allowing shop members to follow teammates without exposing private ledgers.",
+      "type": "object",
+      "properties": {
+        "followId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 256,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "followerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "targetStaffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["followId", "shopId", "ownerUid", "followerUid", "targetStaffId", "createdAt"]
+    },
+    "ShopInvite": {
+      "title": "ShopInvite",
+      "description": "Secret joinCode index mapping an invite code to a shopId.",
+      "type": "object",
+      "properties": {
+        "joinCode": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 24,
+          "pattern": "^[A-Z0-9\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["joinCode", "shopId", "shopName", "ownerUid", "createdAt"]
+    },
+    "ShopShare": {
+      "title": "ShopShare",
+      "description": "Direct user-chosen ledger or attendance share sent between two users in a shop.",
+      "type": "object",
+      "properties": {
+        "shareId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "senderName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "recipientUid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "recipientEmail": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "recipientStaffId": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "recipientName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "summaryText": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 8000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["shareId", "shopId", "ownerUid", "senderUid", "senderName", "recipientUid", "recipientName", "title", "summaryText", "createdAt"]
+    },
+    "ShopRequest": {
+      "title": "ShopRequest",
+      "description": "Staff self-service punch-in/out or leave request subject to owner/manager approval.",
+      "type": "object",
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "shopId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "managerUids": {
+          "type": "array"
+        },
+        "staffId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "staffUid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "staffName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "type": {
+          "type": "string",
+          "enum": ["punch", "leave"]
+        },
+        "requestedStatus": {
+          "type": "string",
+          "enum": ["P", "H", "L"]
+        },
+        "fromDate": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "toDate": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 10,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "reason": {
+          "type": "string",
+          "maxLength": 300
+        },
+        "inTime": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "outTime": {
+          "type": "string",
+          "maxLength": 20
+        },
+        "gps": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "selfie": {
+          "type": "string",
+          "maxLength": 30000
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"]
+        },
+        "reviewNote": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "reviewedByUid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "reviewedByName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["requestId", "shopId", "ownerUid", "managerUids", "staffId", "staffUid", "staffName", "type", "requestedStatus", "fromDate", "toDate", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserPrivate" },
+      "description": "Private user metadata isolated per authenticated user."
+    },
+    "/shopInvites/{joinCode}": {
+      "schema": { "$ref": "#/entities/ShopInvite" },
+      "description": "Exact joinCode lookup table for joining a shop."
+    },
+    "/shops/{shopId}": {
+      "schema": { "$ref": "#/entities/Shop" },
+      "description": "Shop workspace document."
+    },
+    "/shops/{shopId}/members/{memberUid}": {
+      "schema": { "$ref": "#/entities/ShopMember" },
+      "description": "Shop membership and RBAC role assignments."
+    },
+    "/shops/{shopId}/directory/{staffId}": {
+      "schema": { "$ref": "#/entities/StaffDirectory" },
+      "description": "Non-PII teammate cards for follow and status stories."
+    },
+    "/shops/{shopId}/staffPrivate/{staffId}": {
+      "schema": { "$ref": "#/entities/StaffPrivate" },
+      "description": "Strictly isolated staff attendance, self-attendance, salary, and ledger."
+    },
+    "/shops/{shopId}/follows/{followId}": {
+      "schema": { "$ref": "#/entities/ShopFollow" },
+      "description": "Follow relationships between teammates inside the shop."
+    },
+    "/shops/{shopId}/shares/{shareId}": {
+      "schema": { "$ref": "#/entities/ShopShare" },
+      "description": "Direct user-to-user shared attendance or ledger snapshots."
+    },
+    "/shops/{shopId}/requests/{requestId}": {
+      "schema": { "$ref": "#/entities/ShopRequest" },
+      "description": "Staff self-service punch-in/out and leave requests."
+    }
+  }
+}

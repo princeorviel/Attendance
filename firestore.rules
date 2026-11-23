@@ -1,0 +1,558 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Pillar 1: Global Default-Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isShopOwner(shopId) {
+      return isVerifiedUser() &&
+        exists(/databases/$(database)/documents/shops/$(shopId)) &&
+        get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid == request.auth.uid;
+    }
+
+    function isShopManager(shopId) {
+      return isVerifiedUser() &&
+        exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid)).data.role in ['owner', 'manager'];
+    }
+
+    function isShopOwnerOrManager(shopId) {
+      return isShopOwner(shopId) || isShopManager(shopId);
+    }
+
+    function isShopMember(shopId) {
+      return isVerifiedUser() && (
+        isShopOwner(shopId) ||
+        exists(/databases/$(database)/documents/shops/$(shopId)/members/$(request.auth.uid))
+      );
+    }
+
+    // Entity Validators (Pillar 2)
+    function isValidUserPrivate(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'displayName', 'photoUrl', 'activeShopId', 'shopIds', 'createdAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 200 &&
+        data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+        (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 1000)) &&
+        (!('activeShopId' in data) || (data.activeShopId is string && data.activeShopId.size() <= 128)) &&
+        (!('shopIds' in data) || (data.shopIds is list && data.shopIds.size() <= 30 && (data.shopIds.size() == 0 || data.shopIds[0] is string))) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidShop(data) {
+      return data.keys().hasAll(['shopId', 'name', 'ownerUid', 'ownerEmail', 'joinCode', 'managerUids', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['shopId', 'name', 'ownerUid', 'ownerEmail', 'joinCode', 'managerUids', 'createdAt', 'updatedAt']) &&
+        isValidId(data.shopId) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        isValidId(data.ownerUid) &&
+        data.ownerEmail is string && data.ownerEmail.size() >= 3 && data.ownerEmail.size() <= 200 &&
+        data.joinCode is string && data.joinCode.size() >= 4 && data.joinCode.size() <= 24 && data.joinCode.matches('^[A-Z0-9\\-]+$') &&
+        data.managerUids is list && data.managerUids.size() <= 10 &&
+        (data.managerUids.size() == 0 || data.managerUids[0] is string) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidShopInvite(data) {
+      return data.keys().hasAll(['joinCode', 'shopId', 'shopName', 'ownerUid', 'createdAt']) &&
+        data.keys().hasOnly(['joinCode', 'shopId', 'shopName', 'ownerUid', 'createdAt']) &&
+        data.joinCode is string && data.joinCode.size() >= 4 && data.joinCode.size() <= 24 && data.joinCode.matches('^[A-Z0-9\\-]+$') &&
+        isValidId(data.shopId) &&
+        data.shopName is string && data.shopName.size() >= 1 && data.shopName.size() <= 100 &&
+        isValidId(data.ownerUid) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidShopMember(data) {
+      return data.keys().hasAll(['uid', 'shopId', 'ownerUid', 'email', 'displayName', 'role', 'joinedAt', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'shopId', 'ownerUid', 'email', 'displayName', 'role', 'staffId', 'joinCode', 'permissions', 'joinedAt', 'updatedAt']) &&
+        isValidId(data.uid) &&
+        isValidId(data.shopId) &&
+        isValidId(data.ownerUid) &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 200 &&
+        data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100 &&
+        data.role in ['owner', 'manager', 'staff'] &&
+        (!('staffId' in data) || (data.staffId is string && data.staffId.size() <= 128)) &&
+        (!('joinCode' in data) || (data.joinCode is string && data.joinCode.size() <= 24)) &&
+        (!('permissions' in data) || (
+          data.permissions is map &&
+          data.permissions.keys().hasOnly(['canMarkAttendance', 'canApproveRequests', 'canManageMoney', 'canEditSalary', 'canManageStaff']) &&
+          (!('canMarkAttendance' in data.permissions) || data.permissions.canMarkAttendance is bool) &&
+          (!('canApproveRequests' in data.permissions) || data.permissions.canApproveRequests is bool) &&
+          (!('canManageMoney' in data.permissions) || data.permissions.canManageMoney is bool) &&
+          (!('canEditSalary' in data.permissions) || data.permissions.canEditSalary is bool) &&
+          (!('canManageStaff' in data.permissions) || data.permissions.canManageStaff is bool)
+        )) &&
+        data.joinedAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStaffDirectory(data) {
+      return data.keys().hasAll(['staffId', 'shopId', 'ownerUid', 'managerUids', 'name', 'roleLabel', 'followersCount', 'stories', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['staffId', 'shopId', 'ownerUid', 'managerUids', 'linkedUid', 'name', 'photo', 'emo', 'roleLabel', 'followersCount', 'stories', 'createdAt', 'updatedAt']) &&
+        isValidId(data.staffId) &&
+        isValidId(data.shopId) &&
+        isValidId(data.ownerUid) &&
+        data.managerUids is list && data.managerUids.size() <= 10 &&
+        (data.managerUids.size() == 0 || data.managerUids[0] is string) &&
+        (!('linkedUid' in data) || (data.linkedUid is string && data.linkedUid.size() <= 128)) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        (!('photo' in data) || (data.photo is string && data.photo.size() <= 400000)) &&
+        (!('emo' in data) || (data.emo is string && data.emo.size() <= 16)) &&
+        data.roleLabel in ['owner', 'manager', 'staff'] &&
+        data.followersCount is number && data.followersCount >= 0 && data.followersCount <= 1000000 &&
+        data.stories is list && data.stories.size() <= 15 &&
+        (data.stories.size() == 0 || data.stories[0] is map) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStaffPrivate(data) {
+      return data.keys().hasAll(['staffId', 'shopId', 'ownerUid', 'managerUids', 'name', 'days', 'selfDays', 'money', 'sal', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['staffId', 'shopId', 'ownerUid', 'managerUids', 'linkedUid', 'linkedEmail', 'name', 'ph', 'em', 'days', 'selfDays', 'money', 'sal', 'createdAt', 'updatedAt']) &&
+        isValidId(data.staffId) &&
+        isValidId(data.shopId) &&
+        isValidId(data.ownerUid) &&
+        data.managerUids is list && data.managerUids.size() <= 10 &&
+        (data.managerUids.size() == 0 || data.managerUids[0] is string) &&
+        (!('linkedUid' in data) || (data.linkedUid is string && data.linkedUid.size() <= 128)) &&
+        (!('linkedEmail' in data) || (data.linkedEmail is string && data.linkedEmail.size() <= 200)) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        (!('ph' in data) || (data.ph is string && data.ph.size() <= 30)) &&
+        (!('em' in data) || (data.em is string && data.em.size() <= 200)) &&
+        data.days is map &&
+        data.selfDays is map &&
+        data.money is list && data.money.size() <= 2000 &&
+        (data.money.size() == 0 || data.money[0] is map) &&
+        data.sal is map &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidShopFollow(data) {
+      return data.keys().hasAll(['followId', 'shopId', 'ownerUid', 'followerUid', 'targetStaffId', 'createdAt']) &&
+        data.keys().hasOnly(['followId', 'shopId', 'ownerUid', 'followerUid', 'targetStaffId', 'createdAt']) &&
+        isValidId(data.followId) &&
+        isValidId(data.shopId) &&
+        isValidId(data.ownerUid) &&
+        isValidId(data.followerUid) &&
+        isValidId(data.targetStaffId) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidShopShare(data) {
+      return data.keys().hasAll(['shareId', 'shopId', 'ownerUid', 'senderUid', 'senderName', 'recipientUid', 'recipientName', 'title', 'summaryText', 'createdAt']) &&
+        data.keys().hasOnly(['shareId', 'shopId', 'ownerUid', 'senderUid', 'senderName', 'recipientUid', 'recipientEmail', 'recipientStaffId', 'recipientName', 'title', 'summaryText', 'createdAt']) &&
+        isValidId(data.shareId) &&
+        isValidId(data.shopId) &&
+        isValidId(data.ownerUid) &&
+        isValidId(data.senderUid) &&
+        data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 100 &&
+        (
+          isValidId(data.recipientUid) ||
+          (data.recipientUid == '' && 'recipientEmail' in data && data.recipientEmail is string && data.recipientEmail.size() >= 3 && data.recipientEmail.size() <= 200)
+        ) &&
+        (!('recipientEmail' in data) || (data.recipientEmail is string && data.recipientEmail.size() <= 200)) &&
+        (!('recipientStaffId' in data) || (data.recipientStaffId is string && data.recipientStaffId.size() <= 128)) &&
+        data.recipientName is string && data.recipientName.size() >= 1 && data.recipientName.size() <= 100 &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 160 &&
+        data.summaryText is string && data.summaryText.size() >= 1 && data.summaryText.size() <= 8000 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidShopRequest(data) {
+      return data.keys().hasAll(['requestId', 'shopId', 'ownerUid', 'managerUids', 'staffId', 'staffUid', 'staffName', 'type', 'requestedStatus', 'fromDate', 'toDate', 'status', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['requestId', 'shopId', 'ownerUid', 'managerUids', 'staffId', 'staffUid', 'staffName', 'type', 'requestedStatus', 'fromDate', 'toDate', 'reason', 'inTime', 'outTime', 'gps', 'selfie', 'status', 'reviewNote', 'reviewedByUid', 'reviewedByName', 'createdAt', 'updatedAt']) &&
+        isValidId(data.requestId) &&
+        isValidId(data.shopId) &&
+        isValidId(data.ownerUid) &&
+        data.managerUids is list && data.managerUids.size() <= 10 &&
+        (data.managerUids.size() == 0 || data.managerUids[0] is string) &&
+        isValidId(data.staffId) &&
+        isValidId(data.staffUid) &&
+        data.staffName is string && data.staffName.size() >= 1 && data.staffName.size() <= 100 &&
+        data.type in ['punch', 'leave'] &&
+        data.requestedStatus in ['P', 'H', 'L'] &&
+        data.fromDate is string && data.fromDate.size() == 10 && data.fromDate.matches('^\\d{4}-\\d{2}-\\d{2}$') &&
+        data.toDate is string && data.toDate.size() == 10 && data.toDate.matches('^\\d{4}-\\d{2}-\\d{2}$') &&
+        (!('reason' in data) || (data.reason is string && data.reason.size() <= 300)) &&
+        (!('inTime' in data) || (data.inTime is string && data.inTime.size() <= 20)) &&
+        (!('outTime' in data) || (data.outTime is string && data.outTime.size() <= 20)) &&
+        (!('gps' in data) || (data.gps is string && data.gps.size() <= 80)) &&
+        (!('selfie' in data) || (data.selfie is string && data.selfie.size() <= 30000)) &&
+        data.status in ['pending', 'approved', 'rejected'] &&
+        (!('reviewNote' in data) || (data.reviewNote is string && data.reviewNote.size() <= 200)) &&
+        (!('reviewedByUid' in data) || (data.reviewedByUid is string && data.reviewedByUid.size() <= 128)) &&
+        (!('reviewedByName' in data) || (data.reviewedByName is string && data.reviewedByName.size() <= 100)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // Connection Probe
+    match /test/{docId} {
+      allow get: if isSignedIn() && isValidId(docId);
+    }
+
+    // User Private Metadata (strictly isolated per user — self-delete enabled for Shopkeeper ID deletion)
+    match /users/{userId} {
+      allow get: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId;
+      allow list: if false;
+      allow create: if isVerifiedUser() && isValidId(userId) &&
+        request.auth.uid == userId &&
+        isValidUserPrivate(incoming()) &&
+        incoming().uid == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(userId) &&
+        request.auth.uid == userId &&
+        isValidUserPrivate(incoming()) &&
+        incoming().uid == existing().uid &&
+        incoming().email == existing().email &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoUrl', 'activeShopId', 'shopIds', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(userId) && request.auth.uid == userId;
+    }
+
+    // Secret Join Code Lookup (Exact get only; zero shop enumeration; parent shop ownership verified on create)
+    match /shopInvites/{joinCode} {
+      allow get: if isVerifiedUser() && isValidId(joinCode);
+      allow list: if false;
+      allow create: if isVerifiedUser() && isValidId(joinCode) &&
+        isValidShopInvite(incoming()) &&
+        incoming().joinCode == joinCode &&
+        incoming().ownerUid == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        exists(/databases/$(database)/documents/shops/$(incoming().shopId)) &&
+        get(/databases/$(database)/documents/shops/$(incoming().shopId)).data.ownerUid == request.auth.uid;
+      allow update: if false;
+      allow delete: if isVerifiedUser() && isValidId(joinCode) && existing().ownerUid == request.auth.uid;
+    }
+
+    // Shop Workspace (Strict Multi-Tenant Isolation across all Shopkeepers)
+    match /shops/{shopId} {
+      allow get: if isVerifiedUser() && isValidId(shopId) && isShopMember(shopId);
+      allow list: if isVerifiedUser() && (
+        resource.data.ownerUid == request.auth.uid ||
+        request.auth.uid in resource.data.managerUids
+      );
+      allow create: if isVerifiedUser() && isValidId(shopId) &&
+        isValidShop(incoming()) &&
+        incoming().shopId == shopId &&
+        incoming().ownerUid == request.auth.uid &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser() && isValidId(shopId) &&
+        isValidShop(incoming()) &&
+        existing().ownerUid == request.auth.uid &&
+        incoming().shopId == existing().shopId &&
+        incoming().ownerUid == existing().ownerUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['name', 'joinCode', 'managerUids', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(shopId) && existing().ownerUid == request.auth.uid;
+
+      // Memberships & Roles (Master Gate for Shop Tenant Access)
+      match /members/{memberUid} {
+        allow get: if isVerifiedUser() && isValidId(shopId) && isValidId(memberUid) &&
+          (request.auth.uid == memberUid || isShopOwnerOrManager(shopId));
+        allow list: if isVerifiedUser() && (
+          resource.data.ownerUid == request.auth.uid ||
+          resource.data.uid == request.auth.uid
+        );
+        allow create: if isVerifiedUser() && isValidId(shopId) && isValidId(memberUid) &&
+          isValidShopMember(incoming()) &&
+          incoming().shopId == shopId &&
+          incoming().uid == memberUid &&
+          incoming().joinedAt == request.time &&
+          incoming().updatedAt == request.time &&
+          exists(/databases/$(database)/documents/shops/$(shopId)) &&
+          incoming().ownerUid == get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid &&
+          (
+            (
+              get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid == request.auth.uid &&
+              incoming().role in ['owner', 'manager', 'staff']
+            ) ||
+            (
+              request.auth.uid == memberUid &&
+              incoming().role == 'staff' &&
+              'joinCode' in incoming() &&
+              incoming().joinCode == get(/databases/$(database)/documents/shops/$(shopId)).data.joinCode
+            )
+          );
+        allow update: if isVerifiedUser() && isValidId(shopId) && isValidId(memberUid) &&
+          isValidShopMember(incoming()) &&
+          incoming().uid == existing().uid &&
+          incoming().shopId == existing().shopId &&
+          incoming().ownerUid == existing().ownerUid &&
+          incoming().joinedAt == existing().joinedAt &&
+          incoming().updatedAt == request.time &&
+          (
+            (isShopOwner(shopId) && incoming().diff(existing()).affectedKeys().hasOnly(['role', 'permissions', 'staffId', 'displayName', 'updatedAt'])) ||
+            (request.auth.uid == memberUid && incoming().role == existing().role && incoming().diff(existing()).affectedKeys().hasOnly(['staffId', 'displayName', 'updatedAt']))
+          );
+        allow delete: if isVerifiedUser() && isValidId(shopId) && isValidId(memberUid) &&
+          isShopOwner(shopId);
+      }
+
+      // Non-PII Public Teammate Cards (Strictly Scoped to Members of This Shop Only)
+      match /directory/{staffId} {
+        allow get: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) && isShopMember(shopId);
+        allow list: if isVerifiedUser() && isShopMember(shopId);
+        allow create: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) &&
+          isValidStaffDirectory(incoming()) &&
+          incoming().staffId == staffId &&
+          incoming().shopId == shopId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          exists(/databases/$(database)/documents/shops/$(shopId)) &&
+          incoming().ownerUid == get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid &&
+          (
+            isShopOwnerOrManager(shopId) ||
+            (isShopMember(shopId) && incoming().linkedUid == request.auth.uid && incoming().roleLabel == 'staff' && incoming().followersCount == 0)
+          );
+        allow update: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) &&
+          isValidStaffDirectory(incoming()) &&
+          incoming().staffId == existing().staffId &&
+          incoming().shopId == existing().shopId &&
+          incoming().ownerUid == existing().ownerUid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (
+            // Tier 1: Owner/Manager full profile & role updates
+            (isShopOwnerOrManager(shopId) && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'photo', 'emo', 'roleLabel', 'linkedUid', 'managerUids', 'stories', 'followersCount', 'updatedAt'])) ||
+            // Tier 2a: Linked staff member updating own avatar/stories
+            (isShopMember(shopId) && existing().linkedUid == request.auth.uid && incoming().diff(existing()).affectedKeys().hasOnly(['photo', 'emo', 'stories', 'updatedAt'])) ||
+            // Tier 2b: Staff claiming pre-created email-matched profile
+            (
+              isShopMember(shopId) &&
+              (!('linkedUid' in existing()) || existing().linkedUid == '') &&
+              incoming().linkedUid == request.auth.uid &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['linkedUid', 'updatedAt']) &&
+              exists(/databases/$(database)/documents/shops/$(shopId)/staffPrivate/$(staffId)) &&
+              get(/databases/$(database)/documents/shops/$(shopId)/staffPrivate/$(staffId)).data.linkedEmail == request.auth.token.email
+            ) ||
+            // Tier 2c: Atomic +1/-1 followersCount coupled with follow edge create/delete (Pillar 7)
+            (
+              isShopMember(shopId) &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['followersCount', 'updatedAt']) &&
+              (
+                (
+                  incoming().followersCount == existing().followersCount + 1 &&
+                  !exists(/databases/$(database)/documents/shops/$(shopId)/follows/$(request.auth.uid + '_' + staffId)) &&
+                  existsAfter(/databases/$(database)/documents/shops/$(shopId)/follows/$(request.auth.uid + '_' + staffId))
+                ) ||
+                (
+                  incoming().followersCount == existing().followersCount - 1 &&
+                  exists(/databases/$(database)/documents/shops/$(shopId)/follows/$(request.auth.uid + '_' + staffId)) &&
+                  !existsAfter(/databases/$(database)/documents/shops/$(shopId)/follows/$(request.auth.uid + '_' + staffId))
+                )
+              )
+            )
+          );
+        allow delete: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) && isShopOwnerOrManager(shopId);
+      }
+
+      // Strictly Isolated Private Staff Attendance, Salary & Ledger (Current Shop Members Only)
+      match /staffPrivate/{staffId} {
+        allow get: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) && isShopMember(shopId) && (
+          isShopOwnerOrManager(shopId) ||
+          existing().linkedUid == request.auth.uid ||
+          ((!('linkedUid' in existing()) || existing().linkedUid == '') && 'linkedEmail' in existing() && existing().linkedEmail == request.auth.token.email)
+        );
+        allow list: if isVerifiedUser() && isShopMember(shopId) && (
+          resource.data.ownerUid == request.auth.uid ||
+          request.auth.uid in resource.data.managerUids ||
+          resource.data.linkedUid == request.auth.uid ||
+          (resource.data.linkedUid == '' && resource.data.linkedEmail == request.auth.token.email)
+        );
+        allow create: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) &&
+          isValidStaffPrivate(incoming()) &&
+          incoming().staffId == staffId &&
+          incoming().shopId == shopId &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time &&
+          exists(/databases/$(database)/documents/shops/$(shopId)) &&
+          incoming().ownerUid == get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid &&
+          (
+            isShopOwnerOrManager(shopId) ||
+            (
+              isShopMember(shopId) &&
+              incoming().linkedUid == request.auth.uid &&
+              incoming().days.size() == 0 &&
+              incoming().money.size() == 0 &&
+              incoming().sal.size() == 0
+            )
+          );
+        allow update: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) &&
+          isValidStaffPrivate(incoming()) &&
+          incoming().staffId == existing().staffId &&
+          incoming().shopId == existing().shopId &&
+          incoming().ownerUid == existing().ownerUid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          (
+            // Tier 1: Owner / Manager monopoly
+            (
+              isShopOwnerOrManager(shopId) &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['name', 'ph', 'em', 'linkedUid', 'linkedEmail', 'managerUids', 'days', 'selfDays', 'money', 'sal', 'updatedAt'])
+            ) ||
+            // Tier 2a: Linked active Staff can ONLY mark own selfDays
+            (
+              isShopMember(shopId) &&
+              existing().linkedUid == request.auth.uid &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['selfDays', 'updatedAt'])
+            ) ||
+            // Tier 2b: Email-invited Staff claiming their own slot
+            (
+              isShopMember(shopId) &&
+              (!('linkedUid' in existing()) || existing().linkedUid == '') &&
+              'linkedEmail' in existing() &&
+              existing().linkedEmail == request.auth.token.email &&
+              incoming().linkedUid == request.auth.uid &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['linkedUid', 'updatedAt'])
+            )
+          );
+        allow delete: if isVerifiedUser() && isValidId(shopId) && isValidId(staffId) && isShopOwnerOrManager(shopId);
+      }
+
+      // Teammate Follow Edges (Scoped Strictly to Current Shop Members)
+      match /follows/{followId} {
+        allow get: if isVerifiedUser() && isValidId(shopId) && isValidId(followId) && isShopMember(shopId);
+        allow list: if isVerifiedUser() && isShopMember(shopId) && (
+          resource.data.followerUid == request.auth.uid ||
+          resource.data.ownerUid == request.auth.uid
+        );
+        allow create: if isVerifiedUser() && isValidId(shopId) && isValidId(followId) &&
+          isShopMember(shopId) &&
+          isValidShopFollow(incoming()) &&
+          incoming().followId == followId &&
+          incoming().shopId == shopId &&
+          incoming().followerUid == request.auth.uid &&
+          followId == request.auth.uid + '_' + incoming().targetStaffId &&
+          exists(/databases/$(database)/documents/shops/$(shopId)) &&
+          incoming().ownerUid == get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid &&
+          incoming().createdAt == request.time;
+        allow update: if false;
+        allow delete: if isVerifiedUser() && isValidId(shopId) && isValidId(followId) &&
+          isShopMember(shopId) && (existing().followerUid == request.auth.uid || isShopOwner(shopId));
+      }
+
+      // Direct In-App User-to-User Data Share (Scoped Strictly to Current Shop Members)
+      match /shares/{shareId} {
+        allow get: if isVerifiedUser() && isValidId(shopId) && isValidId(shareId) && isShopMember(shopId) && (
+          existing().senderUid == request.auth.uid ||
+          existing().recipientUid == request.auth.uid ||
+          ('recipientEmail' in existing() && existing().recipientEmail != '' && existing().recipientEmail == request.auth.token.email) ||
+          existing().ownerUid == request.auth.uid
+        );
+        allow list: if isVerifiedUser() && isShopMember(shopId) && (
+          resource.data.senderUid == request.auth.uid ||
+          resource.data.recipientUid == request.auth.uid ||
+          resource.data.recipientEmail == request.auth.token.email ||
+          resource.data.ownerUid == request.auth.uid
+        );
+        allow create: if isVerifiedUser() && isValidId(shopId) && isValidId(shareId) &&
+          isShopMember(shopId) &&
+          isValidShopShare(incoming()) &&
+          incoming().shareId == shareId &&
+          incoming().shopId == shopId &&
+          incoming().senderUid == request.auth.uid &&
+          exists(/databases/$(database)/documents/shops/$(shopId)) &&
+          incoming().ownerUid == get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid &&
+          incoming().createdAt == request.time;
+        allow update: if false;
+        allow delete: if isVerifiedUser() && isValidId(shopId) && isValidId(shareId) && isShopMember(shopId) && (
+          existing().senderUid == request.auth.uid ||
+          existing().recipientUid == request.auth.uid ||
+          ('recipientEmail' in existing() && existing().recipientEmail != '' && existing().recipientEmail == request.auth.token.email) ||
+          isShopOwnerOrManager(shopId)
+        );
+      }
+
+      // Staff Self-Service Punch-In/Out & Leave Requests (Scoped Strictly to Current Shop Members)
+      match /requests/{requestId} {
+        allow get: if isVerifiedUser() && isValidId(shopId) && isValidId(requestId) && isShopMember(shopId) && (
+          existing().staffUid == request.auth.uid ||
+          isShopOwnerOrManager(shopId)
+        );
+        allow list: if isVerifiedUser() && isShopMember(shopId) && (
+          resource.data.ownerUid == request.auth.uid ||
+          request.auth.uid in resource.data.managerUids ||
+          resource.data.staffUid == request.auth.uid
+        );
+        allow create: if isVerifiedUser() && isValidId(shopId) && isValidId(requestId) &&
+          isShopMember(shopId) &&
+          isValidShopRequest(incoming()) &&
+          incoming().requestId == requestId &&
+          incoming().shopId == shopId &&
+          incoming().staffUid == request.auth.uid &&
+          incoming().status == 'pending' &&
+          exists(/databases/$(database)/documents/shops/$(shopId)) &&
+          incoming().ownerUid == get(/databases/$(database)/documents/shops/$(shopId)).data.ownerUid &&
+          incoming().createdAt == request.time &&
+          incoming().updatedAt == request.time;
+        allow update: if isVerifiedUser() && isValidId(shopId) && isValidId(requestId) &&
+          isValidShopRequest(incoming()) &&
+          incoming().requestId == existing().requestId &&
+          incoming().shopId == existing().shopId &&
+          incoming().ownerUid == existing().ownerUid &&
+          incoming().staffId == existing().staffId &&
+          incoming().staffUid == existing().staffUid &&
+          incoming().createdAt == existing().createdAt &&
+          incoming().updatedAt == request.time &&
+          existing().status == 'pending' &&
+          (
+            (
+              isShopOwnerOrManager(shopId) &&
+              incoming().status in ['approved', 'rejected'] &&
+              'reviewedByUid' in incoming() &&
+              incoming().reviewedByUid == request.auth.uid &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['status', 'reviewNote', 'reviewedByUid', 'reviewedByName', 'updatedAt'])
+            ) ||
+            (
+              isShopMember(shopId) &&
+              existing().staffUid == request.auth.uid &&
+              incoming().status == 'pending' &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['outTime', 'reason', 'gps', 'updatedAt'])
+            ) ||
+            (
+              isShopOwner(shopId) &&
+              incoming().status == existing().status &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['managerUids', 'updatedAt'])
+            )
+          );
+        allow delete: if isVerifiedUser() && isValidId(shopId) && isValidId(requestId) && isShopMember(shopId) && (
+          (existing().staffUid == request.auth.uid && existing().status == 'pending') ||
+          isShopOwnerOrManager(shopId)
+        );
+      }
+    }
+  }
+}

@@ -8,3 +8,6 @@ coverage/
 .env*
 !.env.example
 DRAFT_firestore.rules
+apk-build/
+Attendance-App.apk
+

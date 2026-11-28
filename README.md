@@ -48,7 +48,16 @@ git remote add origin https://github.com/<YOUR_USERNAME>/<YOUR_REPO>.git
 git push -u origin main
 ```
 
-हर `push` पर `.github/workflows/build-and-deploy.yml` अपने-आप TypeScript चेक और Production PWA build (`dist/`) तैयार कर देगा।
+हर `push` पर `.github/workflows/build-and-deploy.yml` अपने-आप:
+1. TypeScript चेक और Production PWA build (`dist/`) तैयार करता है।
+2. इंस्टॉल होने वाला **Android APK (`Attendance-App.apk`)** बनाकर **GitHub Releases** और **Actions → Artifacts** में अपलोड कर देता है।
+
+### Android APK सीधे GitHub से कैसे डाउनलोड करें
+
+1. अपनी GitHub रिपॉजिटरी के **Releases** सेक्शन में जाएं (`Attendance App (Latest Android APK)`) और नीचे **Assets → `Attendance-App.apk`** पर टैप करके सीधे डाउनलोड व इंस्टॉल करें।
+2. या **Actions → Build & Release Attendance App** के हरे (✅) रन के अंदर नीचे **Artifacts → `Attendance-App-APK`** से डाउनलोड करें।
+
+> **नोट:** Offline / Local Mode APK में तुरंत चलता है। **Google Login व Cloud Shop Sync** के लिए ऐप को Vercel/Netlify के Live HTTPS लिंक पर खोलकर Chrome से **Install app** करना सबसे बेहतर है।
 
 ### 2. Live Web App होस्ट करें (Vercel / Netlify / Firebase Hosting)
 
@@ -62,7 +71,7 @@ git push -u origin main
 
 ---
 
-## Android APK / Play Store (.aab) कैसे बनाएं
+## Play Store (.aab) कैसे बनाएं
 
 क्योंकि यह ऐप पूर्ण **PWA Manifest + Service Worker + Maskable Icons** के साथ तैयार है:
 

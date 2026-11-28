@@ -1,4 +1,4 @@
-name: Build & Verify Attendance PWA
+name: Build & Release Attendance App (PWA + Android APK)
 
 on:
   push:
@@ -7,8 +7,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-pwa:
+    name: Build & Verify PWA
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +25,7 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: TypeScript type check
         run: npm run lint
@@ -35,3 +39,140 @@ jobs:
           name: attendance-pwa-dist
           path: dist/
           retention-days: 14
+
+  build-android-apk:
+    name: Build Android APK
+    needs: build-pwa
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Download built PWA bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: attendance-pwa-dist
+          path: dist
+
+      - name: Prepare Capacitor Android project
+        run: |
+          rm -rf apk-build
+          mkdir -p apk-build
+          cp -r dist apk-build/www
+
+          cat > apk-build/package.json << 'EOF'
+          {
+            "name": "attendance-android-app",
+            "version": "1.0.0",
+            "private": true
+          }
+          EOF
+
+          cat > apk-build/capacitor.config.json << 'EOF'
+          {
+            "appId": "com.attendance.haziri",
+            "appName": "Attendance",
+            "webDir": "www",
+            "server": {
+              "androidScheme": "https"
+            }
+          }
+          EOF
+
+          cd apk-build
+          npm install --no-audit --no-fund @capacitor/core@7.6.11 @capacitor/cli@7.6.11 @capacitor/android@7.6.11
+          npx cap add android
+
+      - name: Apply Attendance launcher icon and permissions
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const resDir = path.join("apk-build", "android", "app", "src", "main", "res");
+
+            // Remove default adaptive icon XML so our custom PNG icon renders on all Android launchers
+            const anydpi = path.join(resDir, "mipmap-anydpi-v26");
+            if (fs.existsSync(anydpi)) {
+              fs.rmSync(anydpi, { recursive: true, force: true });
+            }
+
+            const icon192 = path.join("public", "pwa-192x192.png");
+            const icon512 = path.join("public", "pwa-512x512.png");
+            const targets = [
+              ["mipmap-mdpi", icon192],
+              ["mipmap-hdpi", icon192],
+              ["mipmap-xhdpi", icon192],
+              ["mipmap-xxhdpi", icon512],
+              ["mipmap-xxxhdpi", icon512],
+            ];
+
+            for (const [folder, src] of targets) {
+              if (!fs.existsSync(src)) continue;
+              const dir = path.join(resDir, folder);
+              fs.mkdirSync(dir, { recursive: true });
+              for (const name of ["ic_launcher.png", "ic_launcher_round.png", "ic_launcher_foreground.png"]) {
+                fs.copyFileSync(src, path.join(dir, name));
+              }
+            }
+
+            const manifestPath = path.join("apk-build", "android", "app", "src", "main", "AndroidManifest.xml");
+            let manifest = fs.readFileSync(manifestPath, "utf8");
+            const perms = [
+              "android.permission.ACCESS_FINE_LOCATION",
+              "android.permission.ACCESS_COARSE_LOCATION",
+              "android.permission.CAMERA",
+            ];
+            for (const perm of perms) {
+              if (!manifest.includes(perm)) {
+                manifest = manifest.replace(
+                  "<application",
+                  `    <uses-permission android:name="${perm}" />\n    <application`
+                );
+              }
+            }
+            fs.writeFileSync(manifestPath, manifest, "utf8");
+          '
+
+      - name: Assemble installable Android APK
+        run: |
+          cd apk-build/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../../Attendance-App.apk
+          ls -lh ../../Attendance-App.apk
+
+      - name: Upload Android APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Attendance-App-APK
+          path: Attendance-App.apk
+          retention-days: 30
+
+      - name: Publish APK to GitHub Releases
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Attendance App (Latest Android APK)
+          body: |
+            ## Attendance — हाज़िरी व सैलरी हिसाब (Android APK)
+
+            नीचे **Assets** में `Attendance-App.apk` पर टैप करके सीधे अपने Android फ़ोन में डाउनलोड और इंस्टॉल करें।
+
+            - **Offline / Local Mode:** APK में तुरंत 100% काम करता है।
+            - **Google Login / Cloud Shop Sync:** Google Login के लिए ऐप को Chrome/Safari के Live HTTPS लिंक (Vercel/Netlify) से खोलकर **Install App** करना सबसे बेहतर रहता है।
+          files: Attendance-App.apk
+          make_latest: true

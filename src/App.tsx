@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { auth, googleProvider } from './firebase';
 import { AccountModal } from './components/AccountModal';
+import { AdBanner, initAdSense } from './components/AdBanner';
 import { Avatar } from './components/Avatar';
 import { BackupCard } from './components/BackupCard';
 import { CalendarCard } from './components/CalendarCard';
@@ -36,6 +37,7 @@ import {
   InAppShareRecipient,
   LedgerShareModal,
 } from './components/LedgerShareModal';
+import { LegalInfoModal, LegalTab } from './components/LegalInfoModal';
 import {
   AppShareDownloadButton,
   OfflineIndicator,
@@ -189,6 +191,7 @@ export default function App() {
   const [shopMembers, setShopMembers] = useState<ShopMemberDoc[]>([]);
   const [shopRequests, setShopRequests] = useState<ShopRequestDoc[]>([]);
   const [selectedCloudStaffId, setSelectedCloudStaffId] = useState<string>('');
+  const [legalTab, setLegalTab] = useState<LegalTab | null>(null);
 
   const openShopTeam = (tab: 'team' | 'share' = 'team') => {
     setShopTeamInitialTab(tab);
@@ -220,8 +223,9 @@ export default function App() {
     }
   }, [theme]);
 
-  // Handle PWA Home Screen App Shortcuts (?tab=calendar|hisab|backup or ?open=shop)
+  // Handle PWA Home Screen App Shortcuts (?tab=calendar|hisab|backup, ?open=shop, ?page=privacy|terms|about|contact)
   useEffect(() => {
+    initAdSense();
     try {
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get('tab');
@@ -234,6 +238,15 @@ export default function App() {
       }
       if (params.get('open') === 'shop') {
         openShopTeam('team');
+      }
+      const pageParam = params.get('page');
+      if (
+        pageParam === 'about' ||
+        pageParam === 'privacy' ||
+        pageParam === 'terms' ||
+        pageParam === 'contact'
+      ) {
+        setLegalTab(pageParam);
       }
     } catch {
       // ignore
@@ -1859,6 +1872,55 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        {/* Policy-compliant Google AdSense slot (renders only when VITE_ADSENSE_* env vars are set) */}
+        <AdBanner />
+
+        {/* Quiet Footer with About, Privacy Policy, Terms & Contact links */}
+        <footer className="mt-6 border-t border-slate-200/80 pt-4 pb-2 text-center text-xs text-slate-500 dark:border-slate-800/80 dark:text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5">
+            <button
+              type="button"
+              onClick={() => setLegalTab('about')}
+              className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+            >
+              ऐप के बारे में
+            </button>
+            <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">
+              ·
+            </span>
+            <button
+              type="button"
+              onClick={() => setLegalTab('privacy')}
+              className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+            >
+              प्राइवेसी पॉलिसी
+            </button>
+            <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">
+              ·
+            </span>
+            <button
+              type="button"
+              onClick={() => setLegalTab('terms')}
+              className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+            >
+              नियम व शर्तें
+            </button>
+            <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">
+              ·
+            </span>
+            <button
+              type="button"
+              onClick={() => setLegalTab('contact')}
+              className="hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+            >
+              संपर्क
+            </button>
+          </div>
+          <p className="mt-1.5 text-[11px] text-slate-400 dark:text-slate-500">
+            Attendance — हाज़िरी व सैलरी हिसाब
+          </p>
+        </footer>
       </main>
 
       {/* Mobile Bottom Navigation Bar (56px height, <15% viewport cap) */}
@@ -2374,6 +2436,12 @@ export default function App() {
           }
         />
       )}
+
+      <LegalInfoModal
+        activeTab={legalTab}
+        onChangeTab={setLegalTab}
+        onClose={() => setLegalTab(null)}
+      />
 
       <OfflineIndicator />
       <PWAUpdateToast />

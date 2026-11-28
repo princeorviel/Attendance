@@ -1,0 +1,3 @@
+# Google AdSense ads.txt
+# AdSense अप्रूवल मिलने के बाद नीचे वाली लाइन से "#" हटाएं और pub-0000000000000000 की जगह अपना Publisher ID डालें:
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

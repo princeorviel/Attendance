@@ -81,6 +81,19 @@ git push -u origin main
 
 ---
 
+## फ्री Website + Google AdSense से कमाई कैसे चालू करें
+
+इस ऐप में AdSense अप्रूवल के लिए ज़रूरी **ऐप के बारे में (About), प्राइवेसी पॉलिसी (Privacy Policy), नियम व शर्तें (Terms), संपर्क (Contact)**, `public/ads.txt` और ऑटोमैटिक रिस्पॉन्सिव Ad बैनर पहले से तैयार हैं:
+
+1. **Vercel पर फ्री Live करें:** [vercel.com](https://vercel.com) पर अपने GitHub रेपो (`Attendance`) को Import करके Deploy करें (फ्री)।
+2. **Google AdSense पर Apply करें:** [adsense.google.com](https://www.google.com/adsense) पर अपनी साइट जोड़ें।
+3. **Publisher ID जोड़ें:** Vercel → Project Settings → **Environment Variables** में ये 2 वैल्यू डालकर Redeploy करें:
+   - `VITE_ADSENSE_CLIENT_ID` = `ca-pub-xxxxxxxxxxxxxxxx` (आपका Publisher ID)
+   - `VITE_ADSENSE_SLOT_MAIN` = आपका Display Ad Unit Slot ID
+4. **`public/ads.txt` अपडेट करें:** `public/ads.txt` में अपना `pub-xxxxxxxxxxxxxxxx` नंबर डालकर GitHub पर Push कर दें। इसके बाद ऐप में अपने-आप असली Ads दिखने लगेंगे।
+
+---
+
 ## सुरक्षा (Security Note)
 
 सभी Firestore Security Rules `/firestore.rules` में परिभाषित हैं। ऐप को बड़े स्तर पर पब्लिश करने से पहले अपनी आवश्यकताओं के अनुसार `firestore.rules` की समीक्षा ज़रूर करें।
